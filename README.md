@@ -2,6 +2,11 @@
 
 The **asyncio-telnet** library designed for convenient interaction with Telnet devices in both synchronous and asynchronous modes, making the process straightforward and flexible in various usage scenarios.
 
+[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](docs)
+[![License: Apache License 2.0](https://img.shields.io/badge/License-Apache2-brightgreen.svg)](https://choosealicense.com/licenses/apache-2.0/)
+[![PyPi Version](https://img.shields.io/pypi/v/asyncio-telnet.svg?style=flat-square&logo=asyncio-telnet&logoColor=white)](https://pypi.org/project/asyncio-telnet/)
+[![PyPi downloads](https://static.pepy.tech/personalized-badge/asyncio-telnet?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/asyncio-telnet/)
+
 - **Support for Asynchrony and Synchrony**: Harness the power of asyncio for efficient and non-blocking communication with Telnet servers. With this library, you have the option to choose between asynchronous and synchronous modes, depending on the requirements of your project.
 - **Ease of Use**: The library provides a user-friendly interface for both synchronous and asynchronous cases, making it adaptable to different project needs.
 - **Telnet Protocol Handling**: Transparently handles the intricacies of the Telnet protocol, allowing you to focus on the logic of your application.
