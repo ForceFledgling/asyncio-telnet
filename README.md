@@ -1,6 +1,6 @@
 # **Python Telnet Utility: asyncio-powered**
 
-The \`\*\*asyncio-telnet\*\*\` library designed for convenient interaction with Telnet devices in both synchronous and asynchronous modes, making the process straightforward and flexible in various usage scenarios.
+The **asyncio-telnet** library designed for convenient interaction with Telnet devices in both synchronous and asynchronous modes, making the process straightforward and flexible in various usage scenarios.
 
 - **Support for Asynchrony and Synchrony**: Harness the power of asyncio for efficient and non-blocking communication with Telnet servers. With this library, you have the option to choose between asynchronous and synchronous modes, depending on the requirements of your project.
 - **Ease of Use**: The library provides a user-friendly interface for both synchronous and asynchronous cases, making it adaptable to different project needs.
