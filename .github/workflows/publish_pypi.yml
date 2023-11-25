@@ -9,14 +9,6 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Check files in root
-        run: |
-          ls -la
-          ls -la dist
-          ls -la
-          cat requirements.txt
-          cat setup.py
-
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
