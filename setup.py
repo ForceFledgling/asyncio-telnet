@@ -1,3 +1,4 @@
+import os
 import codecs
 from setuptools import setup, find_packages
 
@@ -9,7 +10,7 @@ with codecs.open('README.md', mode='r', encoding='utf-8') as f:
 
 setup(
     name='asyncio-telnet',
-    version='0.1.9',
+    version=os.environ.get('RELEASE_VERSION'),
     description='Asyncio-based Telnet library',
     long_description=INFO['long_description'],
     long_description_content_type='text/markdown',
