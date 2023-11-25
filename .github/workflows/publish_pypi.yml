@@ -9,6 +9,14 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - name: Check files in root
+        run: |
+          ls -la
+          ls -la dist
+          ls -la
+          cat requirements.txt
+          cat setup.py
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -16,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ls
+          cd $GITHUB_WORKSPACE
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
           pip install -r requirements.txt
@@ -26,6 +34,6 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          cd asyncio_telnet
+          cd $GITHUB_WORKSPACE
           python setup.py sdist bdist_wheel
           twine upload dist/*
