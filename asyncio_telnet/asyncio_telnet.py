@@ -19,27 +19,20 @@ theNULL = bytes([0])
 ECHO = bytes([1])
 
 
-class Telnet:
-
-    def __init__(self, host=None, port=0,
-                 timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+class AsyncTelnet:
+    def __init__(self, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         self.debuglevel = 0
-        self.host = host
-        self.port = port
         self.timeout = timeout
         self.fast_read_timeout = 0.1
         self.reader = None
         self.writer = None
-        if host is not None:
-            asyncio.run(self.open(host, port, timeout))
 
-    async def open(self, host, port=0, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+    async def open(self, host, port=0):
         self.eof = 0
         if not port:
             port = TELNET_PORT
-        self.host = host
         self.port = port
-        self.timeout = timeout
+        self.host = host
 
         try:
             self.reader, self.writer = await asyncio.open_connection(host, port)
@@ -61,6 +54,12 @@ class Telnet:
         return data
     
     async def read_until_eof(self, fast_mode=True):
+        """
+        Performs reading data until the end of the file (EOF).
+        Typically used in the context of file
+        or stream handling to read and extract data from a 
+        source until the end of the file is reached.
+        """
         timeout = self.fast_read_timeout if fast_mode else self.timeout
         response = b''
         while True:
@@ -77,9 +76,15 @@ class Telnet:
         return response
 
     async def __aenter__(self):
+        """
+        Is part of an asynchronous context manager.
+        """
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback):
+        """
+        Is part of an asynchronous context manager.
+        """
         if self.writer:
             await self.writer.drain()
             self.writer.close()
@@ -88,7 +93,7 @@ class Telnet:
 
     async def filter_telnet_data(self, data):
         """
-        Удаляет управляющие символы TELNET из данных.
+        Removes TELNET control characters from the data.
         """
         filtered_data = b''
         i = 0
@@ -113,3 +118,33 @@ class Telnet:
                 filtered_data += data[i:i+1]
                 i += 1
         return filtered_data
+
+
+class AsyncToSyncWrapper:
+    def __init__(self, async_class_instance):
+        self.async_class_instance = async_class_instance
+
+    def __getattr__(self, name):
+        if hasattr(self.async_class_instance, name):
+            attr = getattr(self.async_class_instance, name)
+            if asyncio.iscoroutinefunction(attr):
+                return lambda *args, **kwargs: self._sync_method(attr, *args, **kwargs)
+            else:
+                return attr
+        else:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+
+    def _sync_method(self, async_method, *args, **kwargs):
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(async_method(*args, **kwargs))
+
+
+class Telnet:
+    def __init__(self, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, sync_mode=False):
+        if sync_mode:
+            self._instance = AsyncToSyncWrapper(AsyncTelnet(timeout))
+        else:
+            self._instance = AsyncTelnet(timeout)
+
+    def __getattr__(self, name):
+        return getattr(self._instance, name)
