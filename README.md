@@ -23,7 +23,7 @@ from asyncio_telnet import Telnet
 
 async def main():
     tn = Telnet()
-    await tn.open('10.2.18.88')
+    await tn.open('example.com')
     response = await tn.read_until_eof()
     return response
 
@@ -41,7 +41,7 @@ def main():
     # by specifying sync_mode=True, a wrapper for calling asynchronous methods synchronously is activated internally.
     tn = Telnet(sync_mode=True)
     # now it is possible to directly invoke asynchronous methods through the wrapper
-    tn.open('10.2.18.88')
+    tn.open('example.com')
     response = tn.read_until_eof()
     return response
 
