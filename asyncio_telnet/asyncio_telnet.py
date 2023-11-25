@@ -94,22 +94,22 @@ class Telnet:
         i = 0
         while i < len(data):
             if data[i:i+1] == IAC:
-                # Если встречаем IAC, обрабатываем TELNET команду
+                # If IAC is encountered, process the TELNET command
                 command = data[i:i+3]
                 i += 3
                 if command[1:2] in (WILL, WONT, DO, DONT, IAC):
-                    # Это команда WONT, WILL, DO, DONT или IAC, удаляем ее
+                    # It's a command WONT, WILL, DO, DONT, or IAC, remove it
                     continue
                 elif command[1:2] == b'\xfa':
-                    # Это начало поддержки опции, пропускаем все до IAC SE
+                    # It's the beginning of option support, skip everything until IAC SE
                     iac_se_pos = data.find(b'\xff\xf0', i)
                     if iac_se_pos != -1:
                         i = iac_se_pos + 2
                     else:
-                        # Если IAC SE не найдено, прекращаем обработку данных
+                        # If IAC SE is not found, stop processing data
                         break
             else:
-                # В противном случае добавляем текущий байт к отфильтрованным данным
+                # Otherwise, add the current byte to the filtered data
                 filtered_data += data[i:i+1]
                 i += 1
         return filtered_data
