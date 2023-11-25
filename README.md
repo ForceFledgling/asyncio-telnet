@@ -21,6 +21,7 @@ Here is a simple example of using in an asynchronous context:
 import asyncio
 from asyncio_telnet import Telnet
 
+
 async def main():
     tn = Telnet()
     await tn.open('example.com')
@@ -36,6 +37,7 @@ For synchronous usage, you can use the library in a similar way by simply specif
 
 ```python
 from asyncio_telnet import Telnet
+
 
 def main():
     # by specifying sync_mode=True, a wrapper for calling asynchronous methods synchronously is activated internally.
