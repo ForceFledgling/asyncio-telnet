@@ -17,7 +17,7 @@ You can install the library using pip. Make sure you have Python 3.6 or later in
 
 # Usage
 
-Here is a simple example of using in an asynchronous context.
+Example: Asynchronous Telnet Connection with Default Timeout
 
 ```python
 import asyncio
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 # b'\n***************** User Access Login ********************\r\n\r\nUser:'
 ```
 
-For synchronous usage, you can use the library in a similar way by simply specifying sync_mode=True.
+Example: Synchronous Telnet Connection
 
 ```python
 from asyncio_telnet import Telnet
@@ -61,7 +61,9 @@ if __name__ == '__main__':
 # b'\n***************** User Access Login ********************\r\n\r\nUser:'
 ```
 
-Here is a simple example of using in an asynchronous context with a timeout of 5 seconds. By default, the timeout is set to 30 seconds.
+Example: Asynchronous Telnet Connection with Custom Timeout.
+
+By default, the timeout is set to 30 seconds.
 
 ```python
 import asyncio
@@ -83,6 +85,29 @@ if __name__ == '__main__':
 
 # Example response:
 # Example of a timeout occurrence: Timeout connecting to example.com:23
+```
+
+Example: Asynchronous Telnet Connection with Write Operation
+
+```python
+import asyncio
+from asyncio_telnet import Telnet
+
+async def main():
+    tn = Telnet()
+    await tn.open('example.com')
+    await tn.write(b'Vladimir\r\n')
+    response = await tn.read_until_eof()
+    await tn.close()
+    return response
+
+if __name__ == '__main__':
+    result = asyncio.run(main())
+    print(result)
+
+
+# Example of successful execution:
+# b'\n***************** User Access Login ********************\r\n\r\nUser:Vladimir\r\nPassword:'
 ```
 
 Feel free to check the [documentation](docs) and [examples](examples) for more detailed information.
