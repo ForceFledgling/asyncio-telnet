@@ -51,13 +51,12 @@ class AsyncTelnet:
         self.host = host
 
         try:
-            self.reader, self.writer = await asyncio.open_connection(host, port)
-
+            connect_coroutine = asyncio.open_connection(host, port)
+            self.reader, self.writer = await asyncio.wait_for(connect_coroutine, timeout=self.timeout)
         except asyncio.CancelledError:
-            raise
-
+            raise ValueError(f"Connection canceled for {host}:{port}")
         except Exception as e:
-            raise f"Error connecting to {host}:{port}: {e}"
+            raise ValueError(f"Timeout connecting to {host}:{port}")
     
     async def write(self, buffer):
         """
