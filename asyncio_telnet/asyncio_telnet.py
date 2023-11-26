@@ -101,7 +101,6 @@ class AsyncTelnet:
         timer = 0
         response = b''
         read_timeout = read_timeout or self.read_timeout
-        print('read_timeout', read_timeout)
         if self.mode == 'smart' and self.eor_support is None:
             await self.write(IAC + WILL + EOR)
         while True:
