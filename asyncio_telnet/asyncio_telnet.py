@@ -8,6 +8,7 @@ DEBUGLEVEL = 0
 
 # Telnet protocol defaults
 TELNET_PORT = 23
+GLOBAL_DEFAULT_TIMEOUT = 30
 
 # Telnet protocol characters (don't change)
 theNULL = bytes([0])    # Null (No operation)
@@ -23,7 +24,7 @@ SE  = bytes([240])      # Subnegotiation End
 
 class AsyncTelnet:
 
-    def __init__(self, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+    def __init__(self, timeout=GLOBAL_DEFAULT_TIMEOUT):
         """
         Initializes the Telnet connection with optional timeout settings.
 
@@ -196,7 +197,7 @@ class Telnet:
     """
     Wrapper for synchronous or asynchronous Telnet communication.
     """
-    def __init__(self, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, sync_mode=False):
+    def __init__(self, timeout=GLOBAL_DEFAULT_TIMEOUT, sync_mode=False):
         """
         Initializes the Telnet wrapper.
 
