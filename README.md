@@ -2,9 +2,9 @@
 
 The **asyncio-telnet** library designed for convenient interaction with Telnet devices in both synchronous and asynchronous modes, making the process straightforward and flexible in various usage scenarios.
 
-[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](docs)
-[![License: Apache License 2.0](https://img.shields.io/badge/License-Apache2-brightgreen.svg)](https://choosealicense.com/licenses/apache-2.0/)
-[![PyPi Version](https://img.shields.io/pypi/v/asyncio-telnet.svg?style=flat-square&logo=asyncio-telnet&logoColor=white)](https://pypi.org/project/asyncio-telnet/)
+[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](docs)  
+[![License: Apache License 2.0](https://img.shields.io/badge/License-Apache2-brightgreen.svg)](https://choosealicense.com/licenses/apache-2.0/)  
+[![PyPi Version](https://img.shields.io/pypi/v/asyncio-telnet.svg?style=flat-square&logo=asyncio-telnet&logoColor=white)](https://pypi.org/project/asyncio-telnet/)  
 [![PyPi downloads](https://static.pepy.tech/personalized-badge/asyncio-telnet?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/asyncio-telnet/)
 
 - **Support for Asynchrony and Synchrony**: Harness the power of asyncio for efficient and non-blocking communication with Telnet servers. With this library, you have the option to choose between asynchronous and synchronous modes, depending on the requirements of your project.
@@ -20,7 +20,7 @@ You can install the library using pip. Make sure you have Python 3.6 or later in
 
 # Usage
 
-Here is a simple example of using in an asynchronous context:
+Here is a simple example of using in an asynchronous context.
 
 ```python
 import asyncio
@@ -36,16 +36,21 @@ async def main():
 if __name__ == '__main__':
     result = asyncio.run(main())
     print(result)
+
+
+# example of successful execution
+b'\n***************** User Access Login ********************\r\n\r\nUser:'
 ```
 
-For synchronous usage, you can use the library in a similar way by simply specifying sync_mode=True:
+For synchronous usage, you can use the library in a similar way by simply specifying sync_mode=True.
 
 ```python
 from asyncio_telnet import Telnet
 
 
 def main():
-    # by specifying sync_mode=True, a wrapper for calling asynchronous methods synchronously is activated internally.
+    # by specifying sync_mode=True, a wrapper for calling
+    # asynchronous methodssynchronously is activated internally.
     tn = Telnet(sync_mode=True)
     # now it is possible to directly invoke asynchronous methods through the wrapper
     tn.open('example.com')
@@ -55,6 +60,28 @@ def main():
 if __name__ == '__main__':
     result = main()
     print(result)
+
+
+# example of successful execution
+b'\n***************** User Access Login ********************\r\n\r\nUser:'
+```
+
+Here is a simple example of using in an asynchronous context with a timeout of 5 seconds. By default, the timeout is set to 30 seconds.
+
+```python
+async def main():
+    tn = Telnet(timeout=5)
+    await tn.open('example.com')
+    response = await tn.read_until_eof()
+    return response
+
+if __name__ == '__main__':
+    result = asyncio.run(main())
+    print(result)
+
+
+# example of a timeout occurrence
+ValueError: Timeout connecting to example.com:23
 ```
 
 Feel free to check the documentation for more detailed information and examples.
