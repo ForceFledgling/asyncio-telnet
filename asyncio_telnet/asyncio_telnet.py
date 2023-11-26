@@ -13,6 +13,8 @@ GLOBAL_DEFAULT_TIMEOUT = 30
 # Telnet protocol characters (don't change)
 theNULL = bytes([0])    # Null (No operation)
 ECHO = bytes([1])       # Echo
+EOT = bytes([4])        # End of transmission
+EOR = bytes([25])       # End of record
 SB =  bytes([250])      # Subnegotiation Begin
 WILL = bytes([251])     # Will
 WONT = bytes([252])     # Will Not
@@ -33,12 +35,10 @@ class AsyncTelnet:
         """
         self.debuglevel = 0
         self.timeout = timeout
-        self.read_timeout = timeout
-        self.fast_read_timeout = 2
         self.reader = None
         self.writer = None
 
-    async def open(self, host, port=0):
+    async def open(self, host, port=0, mode=None, read_timeout=None):
         """
         Opens a connection to the specified host and port.
 
@@ -46,12 +46,13 @@ class AsyncTelnet:
             host: The host to connect to.
             port: The port to connect to (default is 0, which uses the default TELNET_PORT).
         """
-        self.eof = 0
         if not port:
             port = TELNET_PORT
         self.port = port
         self.host = host
-
+        self.read_timeout = read_timeout or self.timeout
+        self.mode = mode
+        self.eor_support = None
         try:
             connect_coroutine = asyncio.open_connection(host, port)
             self.reader, self.writer = await asyncio.wait_for(connect_coroutine, timeout=self.timeout)
@@ -59,7 +60,7 @@ class AsyncTelnet:
             raise ValueError(f"Connection canceled for {host}:{port}")
         except Exception as e:
             raise ValueError(f"Timeout connecting to {host}:{port}")
-    
+
     async def write(self, buffer):
         """
         Writes data to the Telnet connection.
@@ -67,11 +68,17 @@ class AsyncTelnet:
         Args:
             buffer: The data to be written.
         """
-        buffer = buffer.replace(IAC, IAC + IAC)
+        if self.mode == 'smart':
+            if self.eor_support:
+                buffer += EOR
+            else:
+                buffer += IAC + WILL + EOR
+        # Write the buffer to the Telnet connection
         self.writer.write(buffer)
+        # Wait until the data is flushed
         await self.writer.drain()
 
-    async def read(self, num_bytes=1):
+    async def read(self, num_bytes=10):
         """
         Reads data from the Telnet connection.
 
@@ -84,28 +91,41 @@ class AsyncTelnet:
         data = await self.reader.read(num_bytes)
         return data
     
-    async def read_until_eof(self, fast_mode=True):
+    async def read_until_eof(self, read_timeout=None, decode=False):
         """
         Reads data from the Telnet connection until the end of the stream.
-
-        Args:
-            fast_mode: If True, uses a fast read timeout; otherwise, uses the standard timeout.
 
         Returns:
             The read data until the end of the stream.
         """
-        timeout = self.fast_read_timeout if fast_mode else self.timeout
+        timer = 0
         response = b''
+        read_timeout = read_timeout or self.read_timeout
+        print('read_timeout', read_timeout)
+        if self.mode == 'smart' and self.eor_support is None:
+            await self.write(IAC + WILL + EOR)
         while True:
+            if timer >= read_timeout:
+                break
             try:
-                data = await asyncio.wait_for(self.read(100), timeout=timeout)
-                if not data:
+                data = await asyncio.wait_for(self.read(100), timeout=0.1)
+                timer +=  0.1
+                if not data and mode != 'smart':
                     break
-                if data.startswith(IAC):
+                if self.eor_support is None:
+                    if WONT + EOR in data or DONT + EOR in data:
+                        self.eor_support = False
+                if IAC in data:
                     data = await self.filter_telnet_data(data)
                 response += data
+                if self.mode == 'smart' and self.eor_support is not None and EOR in data:
+                    break
             except asyncio.TimeoutError:
                 break
+        if self.mode == 'smart' and self.eor_support is None:
+            self.eor_support = True
+        if decode:
+            response = response.decode('ascii')
         return response
 
     async def filter_telnet_data(self, data):
@@ -119,8 +139,8 @@ class AsyncTelnet:
                 # If IAC is encountered, process the TELNET command
                 command = data[i:i+3]
                 i += 3
-                if command[1:2] in (WILL, WONT, DO, DONT, IAC):
-                    # It's a command WONT, WILL, DO, DONT, or IAC, remove it
+                if command[1:2] in (WILL, WONT, DO, DONT, IAC, EOR):
+                    # It's a telnet command, remove it
                     continue
                 elif command[1:2] == SB:
                     # It's the beginning of option support, skip everything until IAC SE
