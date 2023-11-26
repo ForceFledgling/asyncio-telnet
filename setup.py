@@ -24,6 +24,7 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
+        'Framework :: AsyncIO',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
@@ -31,8 +32,14 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Operating System :: MacOS',
+        'Operating System :: POSIX :: Linux',
+        'Operating System :: Microsoft',
+        'Topic :: Internet',
+        'Topic :: Utilities',
+        'Topic :: Terminals :: Telnet',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Software Development :: Libraries :: Python Modules :: Utilities',
     ],
     keywords=(
         'telnet tty asyncio synchronous asyncronous vty vtysh fast simple'
