@@ -10,16 +10,19 @@ DEBUGLEVEL = 0
 TELNET_PORT = 23
 
 # Telnet protocol characters (don't change)
-IAC  = bytes([255]) # "Interpret As Command"
-DONT = bytes([254])
-DO   = bytes([253])
-WONT = bytes([252])
-WILL = bytes([251])
-theNULL = bytes([0])
-ECHO = bytes([1])
+theNULL = bytes([0])    # Null (No operation)
+ECHO = bytes([1])       # Echo
+SB =  bytes([250])      # Subnegotiation Begin
+WILL = bytes([251])     # Will
+WONT = bytes([252])     # Will Not
+DO   = bytes([253])     # Do
+DONT = bytes([254])     # Do Not
+IAC  = bytes([255])     # Interpret As Command
+SE  = bytes([240])      # Subnegotiation End
 
 
 class AsyncTelnet:
+
     def __init__(self, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         self.debuglevel = 0
         self.timeout = timeout
@@ -41,11 +44,10 @@ class AsyncTelnet:
             raise
 
         except Exception as e:
-            print(f"Error connecting to {host}:{port}: {e}")
-            raise
+            raise f"Error connecting to {host}:{port}: {e}"
     
     async def write(self, buffer):
-        buffer = buffer.replace(b'\xff', b'\xff\xff')
+        buffer = buffer.replace(IAC, IAC + IAC)
         self.writer.write(buffer)
         await self.writer.drain()
 
@@ -72,7 +74,6 @@ class AsyncTelnet:
                 response += data
             except asyncio.TimeoutError:
                 break
-        print('response', response)
         return response
 
     async def __aenter__(self):
@@ -89,7 +90,6 @@ class AsyncTelnet:
             await self.writer.drain()
             self.writer.close()
             await self.writer.wait_closed()
-            print("Connection closed")
 
     async def filter_telnet_data(self, data):
         """
@@ -105,9 +105,9 @@ class AsyncTelnet:
                 if command[1:2] in (WILL, WONT, DO, DONT, IAC):
                     # It's a command WONT, WILL, DO, DONT, or IAC, remove it
                     continue
-                elif command[1:2] == b'\xfa':
+                elif command[1:2] == SB:
                     # It's the beginning of option support, skip everything until IAC SE
-                    iac_se_pos = data.find(b'\xff\xf0', i)
+                    iac_se_pos = data.find(IAC + SE, i)
                     if iac_se_pos != -1:
                         i = iac_se_pos + 2
                     else:
