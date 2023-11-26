@@ -19,8 +19,9 @@ setup(
     packages=find_packages(),
     url='https://github.com/ForceFledgling/asyncio-telnet',
     platforms='any',
+    python_requires='>=3.6',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3.6',
@@ -30,7 +31,12 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Software Development :: Libraries :: Python Modules :: Utilities',
     ],
+    keywords=(
+        'telnet tty asyncio synchronous asyncronous vty vtysh fast simple'
+    ),
     install_requires=[
         'asyncio',
     ],
