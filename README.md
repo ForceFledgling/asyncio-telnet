@@ -23,11 +23,12 @@ Here is a simple example of using in an asynchronous context.
 import asyncio
 from asyncio_telnet import Telnet
 
-
 async def main():
     tn = Telnet()
     await tn.open('example.com')
+    await tn.write(b'Vladimir\r\n')
     response = await tn.read_until_eof()
+    await tn.close()
     return response
 
 if __name__ == '__main__':
@@ -35,8 +36,8 @@ if __name__ == '__main__':
     print(result)
 
 
-# example of successful execution
-b'\n***************** User Access Login ********************\r\n\r\nUser:'
+# Example of successful execution:
+# b'\n***************** User Access Login ********************\r\n\r\nUser:'
 ```
 
 For synchronous usage, you can use the library in a similar way by simply specifying sync_mode=True.
@@ -44,14 +45,11 @@ For synchronous usage, you can use the library in a similar way by simply specif
 ```python
 from asyncio_telnet import Telnet
 
-
 def main():
-    # by specifying sync_mode=True, a wrapper for calling
-    # asynchronous methodssynchronously is activated internally.
     tn = Telnet(sync_mode=True)
-    # now it is possible to directly invoke asynchronous methods through the wrapper
     tn.open('example.com')
     response = tn.read_until_eof()
+    tn.close()
     return response
 
 if __name__ == '__main__':
@@ -59,26 +57,32 @@ if __name__ == '__main__':
     print(result)
 
 
-# example of successful execution
-b'\n***************** User Access Login ********************\r\n\r\nUser:'
+# Example of successful execution:
+# b'\n***************** User Access Login ********************\r\n\r\nUser:'
 ```
 
 Here is a simple example of using in an asynchronous context with a timeout of 5 seconds. By default, the timeout is set to 30 seconds.
 
 ```python
+import asyncio
+from asyncio_telnet import Telnet
+
 async def main():
     tn = Telnet(timeout=5)
-    await tn.open('example.com')
-    response = await tn.read_until_eof()
-    return response
+    try:
+        await tn.open('example.com')
+        response = await tn.read_until_eof()
+        await tn.close()
+        return response
+    except ValueError as e:
+        print(f"Example of a timeout occurrence: {e}")
 
 if __name__ == '__main__':
-    result = asyncio.run(main())
-    print(result)
+    asyncio.run(main())
 
 
-# example of a timeout occurrence
-ValueError: Timeout connecting to example.com:23
+# Example response:
+# Example of a timeout occurrence: Timeout connecting to example.com:23
 ```
 
-Feel free to check the [documentation](docs) for more detailed information and examples.
+Feel free to check the [documentation](docs) and [examples](examples) for more detailed information.
