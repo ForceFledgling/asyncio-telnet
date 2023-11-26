@@ -149,6 +149,23 @@ class AsyncTelnet:
                 filtered_data += data[i:i+1]
                 i += 1
         return filtered_data
+    
+    async def close(self):
+        """
+        Closes the writer associated with the current instance.
+
+        If a writer is present, this method first ensures any pending data is
+        flushed using `await self.writer.drain()`. It then closes the writer
+        using `self.writer.close()` and waits until the writer is fully closed
+        with `await self.writer.wait_closed()`.
+
+        Note: It is essential to call this method to gracefully close the writer
+        and release associated resources.
+        """
+        if self.writer:
+            await self.writer.drain()
+            self.writer.close()
+            await self.writer.wait_closed()
 
 
 class AsyncToSyncWrapper:
