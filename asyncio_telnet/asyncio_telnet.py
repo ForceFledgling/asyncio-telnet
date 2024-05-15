@@ -109,7 +109,7 @@ class AsyncTelnet:
             try:
                 data = await asyncio.wait_for(self.read(100), timeout=0.1)
                 timer +=  0.1
-                if not data and mode != 'smart':
+                if not data and self.mode != 'smart':
                     break
                 if self.eor_support is None:
                     if WONT + EOR in data or DONT + EOR in data:
